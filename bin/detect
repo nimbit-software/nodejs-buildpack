@@ -2,7 +2,15 @@
 
 BP=$(dirname "$(dirname $0)")
 if [ -f "$1/package.json" ]; then
-  echo "node.js "$(cat "$BP/VERSION")""
+  # Check for node.js using existing logic
+  # echo "node.js "$(cat "$BP/VERSION")"
+
+  # Check for puppeteer dependency
+  
+  node -p "require('./package.json').dependencies && require('./package.json').dependencies.puppeteer"
+  if [ $? -eq 0 ]; then
+    echo "export PUPPETEER_DETECTED=true" >> "$BP/detect.env"  # Set environment variable
+  fi
   exit 0
 fi
 

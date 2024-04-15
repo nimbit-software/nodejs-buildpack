@@ -9,5 +9,23 @@ mkdir -p "$DEPS_DIR/0"
 mkdir -p "$BUILD_DIR/.profile.d"
 echo "export DEPS_DIR=\$HOME/.cloudfoundry" > "$BUILD_DIR/.profile.d/0000_set-deps-dir.sh"
 
+# Check for presence of 'puppeteer' flag from detect stage
+# Check for PUPPETEER_DETECTED environment variable
+if [ -n "$PUPPETEER_DETECTED" ]; then
+  echo "Installing Chromium for Puppeteer..."
+
+  # Download Chromium (specific version might be needed based on Puppeteer version)
+  # You can find download URLs from the Puppeteer documentation
+  curl -L https://download.chromium.org/LATEST/linux-x64/headless_shell_archive.tar.xz | tar -xJvf -
+
+  # Move Chromium to a specific location within the app droplet
+  mv headless_shell chromium-headless
+
+  # Add Chromium path to environment variable (might be needed by Puppeteer)
+  echo 'export PATH=$PATH:$PWD/chromium-headless' >> $DEPS_DIR/environment
+
+fi
+
+# Continue with standard Node.js buildpack steps
 $BUILDPACK_DIR/bin/supply "$BUILD_DIR" "$CACHE_DIR" "$DEPS_DIR" 0
 $BUILDPACK_DIR/bin/finalize "$BUILD_DIR" "$CACHE_DIR" "$DEPS_DIR" 0
